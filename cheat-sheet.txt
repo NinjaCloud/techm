@@ -1,9 +1,13 @@
-Lab: 0 Create kubeadm cluster 
+Kubernetes Essentials - 
 
- Lab: 1
-Task: 1 Create pod using kubectl command
+Lab 1: Kubernetes Operations on AWS
+Task 1: Setting up a Kubernetes Cluster
+see PDF document 
 
-kubectl run mypod --image=nginx:latest
+Task 2: 
+Task: Create pod using kubectl command
+
+kubectl run testpod --image=nginx:latest
 #list pods
 kubectl get pods
 
@@ -17,7 +21,36 @@ kubectl logs mypod
 #Describe pod to see it's configuration
 kubectl describe pod mypod
 
-Task: 2
+Pod Lifecycle
+•	Pending: Pod is registered in Kubernetes, but the container images are being created.
+•	Running: Pod has been defined on a node, all containers are created, and at least one of them is running.
+•	Succeeded: Containers in the pod have finished their task and have terminated successfully.
+•	Failed: At least one container in the Pod has failed, and all the containers have terminated.
+•	Unknown: Status of the Pod cannot be determined due to an error in communication.
+
+
+Task 2.1 Create pod using yaml file 
+
+vi pod.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: myapp
+  name: multi-con-pod
+spec:
+  containers:
+  - name: con1   ### first container 
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+
+kubectl apply -f pod.yaml
+kubectl get pod
+
+
+Task 3:
 # multiple container in pods 
 
 vi multi-container.yaml
@@ -187,123 +220,16 @@ kubectl create -f httpd-pod.yaml
 kubectl get pod httpd-pod -o wide
 kubectl describe svc httpd-svc
 
-Task 6: Clean-up
+Task 5.1: Clean-up
 
 kubectl delete -f httpd-pod.yaml
 kubectl delete -f httpd-svc.yaml
 
-Lab: 3 Static Pod
-
-To create static pod use folloing commands on worker or master node whereever 
-you want ot place static pod
-
-cd /etc/kubernetes/manifests/
-
-create following static-pod.yaml file here 
-
-vi static-pod.yaml
 
 
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    app: myapp
-  name: static-pod
-spec:
-  containers:
-  - name: app 
-    image: nginx:latest
-    ports:
-    - containerPort: 80
-
-
-kubectl create -f static-pod.yaml
-kubectl get pods -o wide 
-
-remove resource
-kubectl delete -f static-pod.yaml
-
-
-
-
-Lab 4: Kubernetes Network Policy
-
-kubectl run backend --image=nginx --labels role=backend --expose --port=80
-
-kubectl get pod
-kubectl get svc
-
-
-kubectl run --rm -it --image=busybox net-policy 
-wget -qO- -T3 http://backend
-exit
-
-3.	Create a network policy which uses labels to deny all ingress traffic
-
-vi np-deny-all.yml
-
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: backend-policy
-spec:
-  podSelector:
-    matchLabels:
-      role: backend
-  ingress: []
-
-kubectl create -f np-deny-all.yml
-kubectl get networkpolicies
-
-4.	Create a new busybox pod again and verify that it cannot access the backend service
-
-kubectl run --rm -it --image=busybox net-policy
-wget -qO- -T3 http://backend
-it will show timeout
-exit
-
-
-
-5.	Modify the network policy to allow traffic with matching Pod labels 
-Inspect the network policy and notice the selectors
-
-vi np-pod-label-allow.yml
-
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: backend-policy
-spec:
-  podSelector:
-    matchLabels:
-      role: backend
-  ingress:
-  - from:
-    - namespaceSelector: {}
-      podSelector:
-        matchLabels:
-          role: frontend
-		  
-
-before applyinh this yaml describe networkpolicies to check rule
-
-kubectl describe networkpolicies backend-policy
-
-kubectl apply -f np-pod-label-allow.yml
-
-kubectl describe networkpolicies backend-policy
-
-
-kubectl run --rm -it --image=busybox --labels role=frontend net-policy
-wget -qO- -T3 http://backend
-exit
-
-
-Lab 5. Application Lifecycle Management replicaset, deployment,
-Rolling Updates, and Rollbacks, HPA
-
-
+******************
+Lab 3: Deployment*
+******************
 Task 1: Write a Deployment YAML and Apply it
 
 wget https://hpe-content.s3.ap-south-1.amazonaws.com/dep-nginx.yaml
@@ -356,7 +282,7 @@ Task 5: Deployment Auto Scaling HPA - Horizontal Pod Autoscaling
 kubectl autoscale deployment nginx-dep --min=3 --max=8 --cpu-percent=70
 kubectl get hpa
 
-Lab 6: DaemonSet in Kubernetes
+Lab 4: DaemonSet in Kubernetes
 
 wget https://hpe-content.s3.ap-south-1.amazonaws.com/ds-pod.yaml
 
@@ -366,320 +292,9 @@ kubectl get pods -o wide
 kubectl delete -f ds-pod.yaml
 
 
-Lab: 7 Scheduling
 
-Task 1: Deploy pod in specific node based on node-name / hostname
-
-vi node-name.yaml
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-nodename
-  labels:
-    env: test
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-    imagePullPolicy: IfNotPresent
-  nodeName: {node-name / hostname }
-
-kubectl create -f node-name.yaml
-kubectl get pods -o wide 
-see your pod in defined node
- 
-
-Task 2: Node labeling and constraining pods
-
-list node labels
-kubectl get nodes --show-labels
-
-kubectl label nodes <node_name> disktype=ssd
-
-list you nodes to check labels 
-kubectl get nodes --show-labels | grep "disktype=ssd"
-
-vi nlns-pod.yaml
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nlns-nginx-pod
-  labels:
-    env: test
-spec:
-  containers:
-  - name: nlns-nginx-ctr
-    image: nginx
-  nodeSelector:
-    disktype: ssd
-
-
-kubectl apply -f nlns-pod.yaml
-kubectl get pods -o wide
-
-### Advanced Pod Scheduling
-
-Task 3: Node Affinity
-
-vi node-aff-pref.yaml
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: na-nginx-pod1
-spec:
-  containers:
-  - name: na-nginx-ctr1
-    image: nginx
-  affinity:
-    nodeAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 1
-        preference:
-          matchExpressions:
-          - key: disktype
-            operator: In
-            values:
-            - ssd
-
-kubectl apply -f node-aff-pref.yaml
-kubectl get pods -o wide
-
-Remove node label 
-
-kubectl label nodes <node_name> disktype-
-deploy same pod again it is getting deployed
-
-Task 4: required during scheduling
-
-remove label first 
-kubectl label nodes <node_name> disktype-
-
-
-vi aff-na-pod2.yaml
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: na-nginx-pod2
-spec:
-  containers:
-  - name: na-nginx-ctr2
-    image: nginx
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: disktype
-            operator: In
-            values:
-            - ssd
-
-kubectl create -f aff-na-pod2.yaml
-
-pod is strictly looking for labeled node
-
-kubectl get pods -o wide
-kubectl label nodes <node_name> disktype=ssd
-
-once label is added pod will deployed
-
-Lab: 7.1  
-
-Task 1: Pod Affinity
-
-vi depend-pod.yaml
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: pa-nginx-pod1
-  labels:
-    app: pa-nginx-app
-spec:
-  containers:
-  - name: pa-nginx-ctr1
-    image: nginx
-
-kubectl create -f depend-pod.yaml
-kubectl get pods
-
-Task 2: create pod with pod affinity
-
-vi aff-pa-pod2.yaml
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: pa-nginx-pod2
-spec:
-  containers:
-  - name: pa-nginx-ctr2
-    image: nginx
-  affinity:
-    podAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app
-            operator: In
-            values:
-            - pa-nginx-app
-        topologyKey: kubernetes.io/hostname
-
-kubectl create -f pod-affinity.yaml
-
-kubectl get pods -o wide
-both pod are in same node
-
-Task 3: pod anti affinity
-
-vi pod-antiaff.yaml
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx
-spec:
-  selector:
-    matchLabels:
-      app: nginx
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - pa-nginx-app
-            topologyKey: "kubernetes.io/hostname"
-      containers:
-      - name: nginx
-        image: nginx
-
-kubectl create -f  pod-antiaff.yaml
-kubectl get pod -o wide 
-
-
-kubectl delete -f  pod-antiaff.yaml
-
-
-Lab: 8 Taint and tolerations
-
-Task 2: Taint and tolerations
-
-taint node
-
-kubectl taint node node-name key=value:effect
-kubectl taint node node-name data=test:NoExecute
-
-NoSchedule, PreferNoSchedule, NoExecute
-
-vi tpod.yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: my-pod
-spec:
-  containers:
-  - name: con1
-    image: nginx:latest
-  tolerations:
-  - key: "node-role.kubernetes.io/control-plane"
-    operator: "Equal"
-#    value: "test"
-    effect: "NoSchedule"
-	
-  
-  
-  kubectl create -f tpod.yaml
-  
-  kubectl get pods -o wide
-  your pod is in master node
-
-
-
-
-Lab 9: Resource Quotas in Kubernetes
-
-Task 1: Creating a Namespace
-kubectl create namespace quotas
-kubectl get ns
-kubectl describe ns quotas
-
-Task 2: Creating a resourcequota
-
-vi rq-quotas.yaml
-
-apiVersion: v1
-kind: ResourceQuota
-metadata:
-  name: quota
-  namespace: quotas
-spec:
-  hard:
-    requests.cpu: "1"
-    requests.memory: 1Gi
-    limits.cpu: "2"
-    limits.memory: 2Gi
-
-kubectl create -f rq-quotas.yaml
-kubectl describe ns resourcequota
-
-
-
-
-Task 3: Verify resourcequota Functionality
-
-vi rq-pod.yaml
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: quota-pod
-  namespace: quotas
-spec:
-  containers:
-  - name: quota-ctr
-    image: nginx
-    resources:
-      limits:
-        memory: "800Mi"
-        cpu: "1000m"
-      requests:
-        memory: "600Mi"
-        cpu: "350m"
-    ports:
-      - containerPort: 80
-	  
-kubectl create -f rq-pod.yaml
-kubectl describe ns resourcequota
-kubectl get resourcequota -n quotas -o yaml
-
-
-Task 4: Limiting Number of Pods
-
-kubectl edit resourcequotas quota -n quotas
-add following lines in spec: > hard:
-count/deployments.apps: 2
-count/replicasets.apps: 3
-
-Task 5: Clean-up
-1.	Delete the quota to clean up.
-$ kubectl delete ns quotas
-
-
-Lab: 10 Volumes 
+************
+Lab 5:  Volumes 
 
 
 EmptyDir , hostPath , persistant volume
@@ -863,4 +478,4 @@ kubectl exec -it pv-container -- bash
 cd /mnt
 ls
 
-	
+
