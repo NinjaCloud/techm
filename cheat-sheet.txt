@@ -153,10 +153,6 @@ kubectl exec -it testpod -- bash
 apt update && apt install curl -y
 curl http://httpd-svc
 
-kubectl get nodes -owide | awk '{print $7}'
-
-ssh -t admin@< replace Node_IP> curl < replace Cluster_IP>:< replace Service_Port>
-
 Task 3: Setup NodePort service
 
 vi httpd-svc.yaml
