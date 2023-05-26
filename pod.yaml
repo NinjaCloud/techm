@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: myapp
+    env: dev
+  name: myres-pod
+spec:
+  containers:
+  - name: con1   ### first container
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+    resources:
+       requests:
+         memory: "64Mi"
+         cpu: "100m"
+       limits:
+         memory: "128Mi"
+         cpu: "500m"
+  - name: con2
+    image: tomcat:latest
+    ports:
+    - containerPort: 8080
+    resources:
+       requests:
+         memory: "64Mi"
+         cpu: "100m"
+       limits:
+         memory: "128Mi"
+         cpu: "500m"
