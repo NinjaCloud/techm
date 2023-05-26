@@ -221,6 +221,45 @@ Task 5.1: Clean-up
 kubectl delete -f httpd-pod.yaml
 kubectl delete -f httpd-svc.yaml
 
+TaskL 6 Container resource limits:
+
+vi myres-pod.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: myapp
+  name: myres-pod
+spec:
+  containers:
+  - name: con1   ### first container
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+    resources:
+       requests:
+         memory: "64Mi"
+         cpu: "100m"
+       limits:
+         memory: "128Mi"
+         cpu: "500m"
+  - name: con2
+    image: tomcat:latest
+    ports:
+    - containerPort: 8080
+    resources:
+       requests:
+         memory: "64Mi"
+         cpu: "100m"
+       limits:
+         memory: "128Mi"
+         cpu: "500m"
+
+kubectl create -f myres-pod.yaml
+kubectl get pods
+kubectl describe pod myres-pod
+
 
 
 ******************
