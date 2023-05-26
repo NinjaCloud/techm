@@ -261,6 +261,73 @@ kubectl get pods
 kubectl describe pod myres-pod
 
 
+Task: 7 ReplicationController 
+
+vi myrc.yaml
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+   name: myrc
+spec:
+   replicas: 3
+   selector:
+     app: myapp
+   template:
+     metadata:
+       labels:
+          app: myapp
+     spec:
+        containers:
+        - name: con1
+          image: nginx:latest
+          ports:
+          - containerPort: 80
+
+
+kubectl create -f myrc.yaml
+kubectl get rc
+kubectl get pods
+
+
+Task: 8 ReplicaSet
+
+vi myrs.yaml
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+   name: my-rplicaset
+spec:
+   replicas: 3
+   selector:
+     matchExpressions:
+      - key: app
+        operator: In
+        values: [myapp]
+      - key: env
+        operator: NotIn
+        values: [dev]
+   template:
+     metadata:
+       labels:
+          app: myapp
+     spec:
+        containers:
+        - name: con1
+          image: nginx:latest
+          ports:
+          - containerPort: 80
+
+
+
+kubectl create -f myrs.yaml
+kubectl get rs
+kubectl get pods
+
+kubectl scale rs my-rplicaset --replicas=5
+
+
 
 ******************
 Lab 3: Deployment*
