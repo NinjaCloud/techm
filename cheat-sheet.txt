@@ -597,8 +597,7 @@ ls
 Lab 6: StatefulSet Implementation
 
 Task 1:  Creating a StatefulSet
-
-wget files.cloudthat.training/devops/kubernetes-essentials/nginx-sts.yaml
+wget https://s3.ap-south-1.amazonaws.com/files.cloudthat.training/devops/kubernetes-essentials/nginx-sts.yaml
 
 kubectl apply -f nginx-sts.yaml
 
