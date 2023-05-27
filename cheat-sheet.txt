@@ -795,7 +795,40 @@ kubectl create -f depend-pod.yaml
 kubectl get pods
 
 
-Task 9.1: pod affinity 
+
+
+Task: 9.1 pod affinity
+
+  vi pod-aff-pref.yaml
+  
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pa-nginx-pod2
+spec:
+  containers:
+  - name: pa-nginx-ctr2
+    image: nginx
+  affinity:
+    podAffinity:  ##to anti affinity make it podAntiAffinity 
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:  
+          labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - pa-nginx-app
+          topologyKey: kubernetes.io/hostname
+
+
+kubectl create -f pod-aff-pref.yaml
+kubectl get pods -o yaml
+
+
+
+Task 9.2: pod affinity 
 
 vi pod-affinity.yaml
 
@@ -819,7 +852,7 @@ spec:
         topologyKey: kubernetes.io/hostname
 
 kubectl create -f depend-pod.yaml
-kubectl get pods
+kubectl get pods -o wide
 
 
 
