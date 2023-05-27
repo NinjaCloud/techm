@@ -460,30 +460,40 @@ Task: 2 hostPath volume
 
 vi hostpath-vol.yaml
 
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: hostvol-pod
+  name: host-voldep
 spec:
-  containers:
-  - name: ng
-    image: nginx:latest
-    ports:
-    - containerPort: 80
-    volumeMounts:
-    - name: empvol
-      mountPath: /data
-  - name: tom
-    image: tomcat:latest
-    ports:
-    - containerPort: 8080
-    volumeMounts:
-    - name: empvol
-      mountPath: /data
-  volumes:
-  - name: empvol
-    hostPath:
-      path: /data 
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hostapp
+  template:
+    metadata:
+      labels:
+        app: hostapp
+    spec:
+      containers:
+      - name: con1
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: myvol
+          mountPath: /data
+      - name: con2
+        image: tomcat:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: myvol
+          mountPath: /data
+      volumes:
+      - name: myvol
+        hostPath:
+          path: /data
+
 
 kubectl apply -f hostpath-vol.yaml
 
