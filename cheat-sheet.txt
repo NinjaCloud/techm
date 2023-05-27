@@ -587,7 +587,7 @@ re-create pod again
 kubectl create -f pvc-pod.yaml
 check your mango.txt file is already there
 kubectl exec -it pv-pod -- bash
-cd /mnt
+cd /usr/share/nginx/html
 ls
 
 
