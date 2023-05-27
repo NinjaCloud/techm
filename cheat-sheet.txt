@@ -498,7 +498,7 @@ spec:
 kubectl apply -f hostpath-vol.yaml
 
 Task 2.1 Login to 1st  container and create following files
-kubectl exec -it hostvol-pod -c ng -- bash
+kubectl exec -it <pod-name> -c con1 -- bash
 
 cd /data/
 touch file1.txt file2.txt file3.txt
@@ -508,7 +508,7 @@ exit
 
 Now loginto second container and verify data is accessible here also in second container.
 
-kubectl exec -it hostvol-pod -c tom -- bash
+kubectl exec -it <pod-name> -c con2 -- bash
 cd /data/
 ls
 file1.txt  file2.txt  file3.txt
