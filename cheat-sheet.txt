@@ -835,7 +835,7 @@ vi pod-affinity.yaml
 apiVersion: v1
 kind: Pod
 metadata:
-  name: pa-nginx-pod2
+  name: pa-nginx-pod-req
 spec:
   containers:
   - name: pa-nginx-ctr2
