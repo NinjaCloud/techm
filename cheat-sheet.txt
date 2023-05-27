@@ -591,3 +591,145 @@ cd /usr/share/nginx/html
 ls
 
 
+
+
+
+Lab 6: StatefulSet Implementation
+
+Task 1:  Creating a StatefulSet
+
+wget files.cloudthat.training/devops/kubernetes-essentials/nginx-sts.yaml
+
+kubectl apply -f nginx-sts.yaml
+
+kubectl get service 
+kubectl get statefulset 
+kubectl get pods 
+
+for i in 0 1; do kubectl exec "nginx-sts-$i" -- sh -c 'hostname'; done
+
+kubectl run -i --tty --image busybox:1.28 dns-test --restart=Never --rm
+
+nslookup nginx-sts-0.nginx-svc
+nslookup nginx-sts-1.nginx-svc
+
+exit
+
+kubectl delete pod -l app=nginx-sts
+kubectl get pod  -l app=nginx-sts
+
+for i in 0 1; do kubectl exec "nginx-sts-$i" -- sh -c 'hostname'; done
+
+Task 2: Writing to a Scalable Storage
+
+kubectl get pvc -l app=nginx-sts
+
+for i in 0 1; do kubectl exec "nginx-sts-$i" -- sh -c 'echo "$(hostname)" > /usr/share/nginx/html/index.html'; done
+
+for i in 0 1; do kubectl exec -i -t "nginx-sts-$i" -- curl http://localhost/; done
+
+Task 3: Scaling StatefulSet
+
+kubectl scale sts nginx-sts --replicas=5
+kubectl get pods -w -l app=nginx-sts
+
+kubectl get pods -l app=nginx-sts
+kubectl get pvc -l app=nginx-sts
+
+kubectl edit sts nginx-sts
+
+# Set spec: replicas to 3, Press Esc and :wq! to exit vi
+
+kubectl get pods -w -l app=nginx-sts
+kubectl get pvc -l app=nginx-sts
+
+Task 4: Rolling Update
+
+kubectl edit sts nginx-sts
+
+# Change the spec: conatiners: image value to nginx:latest, Press Esc and :wq! to exit vi
+
+kubectl get pod -l app=nginx-sts 
+kubectl get pods
+kubectl describe pod nginx-sts-0 | grep Image
+kubectl delete -f nginx-sts.yaml
+
+Task 5: Clean-up Resources
+
+kubectl delete -f nginx-sts.yaml
+
+Task 6: Deploy pod in specific node 
+
+root@ip-172-31-30-120:~/allyamls# kubectl get nodes
+NAME                                          STATUS   ROLES                  AGE   VERSION
+ip-172-20-45-33.us-west-1.compute.internal    Ready    node                   13m   v1.23.16  ## Copy node name and paste in nodeName section in below YAML
+ip-172-20-58-92.us-west-1.compute.internal    Ready    control-plane,master   14m   v1.23.16
+ip-172-20-60-194.us-west-1.compute.internal   Ready    node                   13m   v1.23.16
+
+
+vi node-name.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-nodename
+  labels:
+    env: test
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeName: ip-172-20-45-33.us-west-1.compute.internal
+
+kubectl create -f node-name.yaml
+kubectl get pods -o wide 
+see your pod in defined node
+
+
+
+Task 7:  Deploy pod in selected nodes based on node labels.
+ 
+kubectl get nodes --show-labels
+assign label to any node
+kubectl label node {NODE-NAME}  disktype=ssd
+
+#Find node with your label
+kubectl get nodes --show-labels | grep "disktype=ssd"
+
+vi node-label.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    env: test
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeSelector:
+    disktype: ssd
+
+kubectl create -f node-label.yaml
+kubectl get pods -o wide
+
+Task 8: Pod affinity
+
+vi depend-pod.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pa-nginx-pod1
+  labels:
+    app: pa-nginx-app
+spec:
+  containers:
+  - name: pa-nginx-ctr1
+    image: nginx
+
+kubectl create -f depend-pod.yaml
+kubectl get pods
