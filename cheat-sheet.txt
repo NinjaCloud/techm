@@ -851,7 +851,7 @@ spec:
             - pa-nginx-app
         topologyKey: kubernetes.io/hostname
 
-kubectl create -f depend-pod.yaml
+kubectl create -f pod-affinity.yaml
 kubectl get pods -o wide
 
 
