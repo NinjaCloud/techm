@@ -575,7 +575,7 @@ spec:
 
 kubectl apply -f pvc-pod.yaml
 kubectl get pvc
-kubectl exec -it pv-container -- bash
+kubectl exec -it pv-pod -- bash
 cd /usr/share/nginx/html
 create a  file 
 touch mango.txt
@@ -586,7 +586,7 @@ kubectl delete -f pvc-pod.yaml
 re-create pod again
 kubectl create -f pvc-pod.yaml
 check your mango.txt file is already there
-kubectl exec -it pv-container -- bash
+kubectl exec -it pv-pod -- bash
 cd /mnt
 ls
 
