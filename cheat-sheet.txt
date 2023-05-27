@@ -739,7 +739,7 @@ spec:
             values:
             - ssd
 
-kubectl create -f  node-aff-pref.yaml.yaml
+kubectl create -f  node-aff-pref.yaml
 kubectl get pod -o wide
 
 
