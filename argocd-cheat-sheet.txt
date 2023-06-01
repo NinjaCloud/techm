@@ -64,3 +64,45 @@ argocd app delete testfromcli
 
 
 Task: 5 Repeat above task from GUI
+
+Task: 6 Create application using application YAML 
+
+
+
+Task: 7 Create application in argocd using private github repo
+
+vi orange-application.yaml
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: orange-app
+  namespace: argocd
+spec:
+  syncPolicy:
+    automated:
+      prune: true
+  project: default
+  source:
+    repoURL: https://github.com/eraneeshansari/orange.git
+    targetRevision: HEAD
+    path: ./
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+
+
+kubectl create -f orange-app.yaml
+argocd app list
+
+
+
+Task: 8  settingup timeout / autosync time , ( without reconciliation time argocd sync by default in 3 minutes)
+
+kubectl -n argocd describe pod argocd-repo-server-7c59ff786d-7n7hq | grep -i "ARGOCD_RECONCILIATION_TIMEOUT"
+
+patch command to set reconciliation time 5 minute
+kubectl -n argocd  patch cm argocd-cm --patch='{"data":{"timeout.reconciliation":"300s"}}'
+
+check reconciliation time in yaml format.
+kubectl -n argocd get cm argocd-cm -o yaml
