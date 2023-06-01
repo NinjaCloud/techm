@@ -3,6 +3,11 @@ Task: 1 install argocd in kops cluster
 kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
+create clusterip to nodeport service 
+kubectl -n argocd edit svc argocd-server
+
+change type: NodePort
+
 command to get argocd admin user password
 
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
