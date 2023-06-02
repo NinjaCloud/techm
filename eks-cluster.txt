@@ -74,8 +74,94 @@ nodeGroups:
 
 eksctl create cluster -f eks.yaml
 
-eksctl create nodegroup --config-file=eks.yaml
+eksctl delete cluster -f eks.yaml
+
 
 Download kube/config file now 
 	
+
+###   Install EBS CSI drivers
+
+
+create policy with given policy.josn file
+goto IAM create policy using json file 
+
+policy name should look like this
+arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+
+
+kubectl create secret generic aws-secret \
+    --namespace kube-system \
+    --from-literal "key_id=AKIAXLLKKPGIZ34MSDUC" \
+    --from-literal "access_key=FlQZK0Gn64mt8P0VBw/oIrCzrKTNQaJoPl+qTcz7"
+
+kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.19"
+
+kubectl get pods -n kube-system -l app.kubernetes.io/name=aws-ebs-csi-driver
+
+
+
+check pods are running 
+kubectl get pods -n kube-system -l app.kubernetes.io/name=aws-ebs-csi-driver
+
+
+Task: 1 
+
+vi pvc.yaml
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 2Gi
+
+kubectl create -f pvc.yaml
+
+
+Task: 2 create pod now
+
+vi pvc-pod.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+  labels:
+     app: myapp
+     env: dev
+spec:
+ containers:
+ - name: con1
+   image: nginx:latest
+   ports:
+   - containerPort: 80
+   volumeMounts:
+   - name: myvol
+     mountPath: /mnt
+ volumes:
+ - name: myvol
+   persistentVolumeClaim:
+      claimName: myclaim
+
+kubectl create -f pvc-pod.yaml
+
+kubectl get pvc
+kubectl get pod
+
+
+clean up
+kubectl delete -f pvc.yaml -f pvc-pod.yaml
+kubectl delete -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.19"
+
+
+
+
+
+
 
