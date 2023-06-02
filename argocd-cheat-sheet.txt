@@ -106,3 +106,65 @@ kubectl -n argocd  patch cm argocd-cm --patch='{"data":{"timeout.reconciliation"
 
 check reconciliation time in yaml format.
 kubectl -n argocd get cm argocd-cm -o yaml
+
+
+
+Task: 9 Webhook setup
+
+step: 1 select your repo > goto setting > click webhooks
+
+payload URL 
+
+http://MasterNodes-IP:PORT/api/webhook
+
+
+step: 2 enable insecure access on browser
+Edit deployment 
+ 
+kubectl -n argocd edit deployments.apps argocd-server
+
+add following lines in args section
+
+      containers:
+      - args:
+        - /usr/local/bin/argocd-server
+        - --insecure
+
+Now wait for pod to be recreated..
+
+Step: 3 enable insecure connection using configmap
+add following code 
+
+
+kubectl -n argocd edit cm argocd-cmd-params-cm
+
+apiVersion: v1
+data:
+  server.insecure: "true"
+kind: ConfigMap
+
+
+Step: 4 create application in argocd , after successful deployment change something in github 
+to see changes...
+
+
+Task: 10 deploy application using helm chart
+
+add helm repo in argocd 
+
+settings > Repositories > connect repo
+
+Choose your connection method: https
+
+CONNECT REPO USING HTTPS: type > Helm
+
+name: helm-repo
+
+
+project : default 
+
+Repository URL: https://charts.bitnami.com/bitnami
+
+
+click on connect button 
+
