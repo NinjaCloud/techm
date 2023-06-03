@@ -83,13 +83,6 @@ Download kube/config file now
 ###   Install EBS CSI drivers
 
 
-create policy with given policy.josn file
-goto IAM create policy using json file 
-
-policy name should look like this
-arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
-
-
 kubectl create secret generic aws-secret \
     --namespace kube-system \
     --from-literal "key_id=AKIAXLLKKPGIZ34MSDUC" \
@@ -105,51 +98,87 @@ check pods are running
 kubectl get pods -n kube-system -l app.kubernetes.io/name=aws-ebs-csi-driver
 
 
-Task: 1 
 
+Lab: 1 create pvc
+
+step: 1 
 vi pvc.yaml
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: myclaim
+  annotations:
+  name: jenkins-pvc
 spec:
   accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
+  - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
+      storage: 8Gi
+  volumeMode: Filesystem
+
 
 kubectl create -f pvc.yaml
 
+kubectl get pvc
 
-Task: 2 create pod now
 
-vi pvc-pod.yaml
+Step: 2  create Jenkins
 
-apiVersion: v1
-kind: Pod
+vi jenkins.yaml
+
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: mypod
   labels:
-     app: myapp
-     env: dev
+    app: jenkins
+  name: jenkins
 spec:
- containers:
- - name: con1
-   image: nginx:latest
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+      - image: jenkins/jenkins:2.375.2-lts-jdk11
+        name: jenkins
+        ports:
+        - containerPort: 8080
+        securityContext:
+          allowPrivilegeEscalation: true
+          privileged: true
+          readOnlyRootFilesystem: false
+          runAsUser: 0
+        volumeMounts:
+          - mountPath: /var/jenkins_home
+            name: jenkins-vol
+      volumes:
+      - name: jenkins-vol
+        persistentVolumeClaim:
+          claimName: jenkins-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: jenkins-svc
+spec:
+   type: NodePort
+   selector:
+       app: jenkins
    ports:
-   - containerPort: 80
-   volumeMounts:
-   - name: myvol
-     mountPath: /mnt
- volumes:
- - name: myvol
-   persistentVolumeClaim:
-      claimName: myclaim
+   - port: 8080
+     nodePort: 30123
 
-kubectl create -f pvc-pod.yaml
+
+kubectl create -f jenkins.yaml
+
+kubectl get deployment 
+kubectl get pods
+
 
 kubectl get pvc
 kubectl get pod
