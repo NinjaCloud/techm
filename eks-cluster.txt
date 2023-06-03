@@ -185,10 +185,11 @@ kubectl get pod
 
 
 clean up
-kubectl delete -f pvc.yaml -f pvc-pod.yaml
+kubectl delete -f pvc.yaml -f jenkins.yaml
 kubectl delete -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.19"
 
 
+eksctl delete cluster -f eks.yaml
 
 
 
