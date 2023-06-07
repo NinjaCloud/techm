@@ -76,7 +76,7 @@ helm install --debug --dry-run mychart ./mychart/
 helm install mychart ./mychart/
 
 see YAML file of running Helm chart
-helm get manifest .mychart/
+helm get manifest mychart
 
 
 
