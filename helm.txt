@@ -205,7 +205,7 @@ spec:
       - image: {{ .Values.app.image }}
         name: {{ .Values.app.name }}
         ports:
-        - containerPort: {{ .Values.app.ports.containerport }}
+        - containerPort: {{ .Values.app.ports.containerPort }}
 
 EOT
 
