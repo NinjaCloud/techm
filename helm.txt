@@ -244,17 +244,16 @@ Thank you for support {{ .Chart.Name }}.
    
 EOT
 
-
-
-
 $ tree
+
 .
-|-- Chart.yaml
-|-- charts
-|-- templates
-|   |-- deployment.yaml
-|   `-- service.yaml
-`-- values.yaml
+├── Chart.yaml
+├── templates
+│   ├── NOTES.txt
+│   ├── _helpers.tpl
+│   ├── deployment.yaml
+│   └── service.yaml
+└── values.yaml
 
 
 
