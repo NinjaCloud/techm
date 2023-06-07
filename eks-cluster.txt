@@ -85,8 +85,8 @@ Download kube/config file now
 
 kubectl create secret generic aws-secret \
     --namespace kube-system \
-    --from-literal "key_id=AKIAXLLKKPGIZ34MSDUC" \
-    --from-literal "access_key=FlQZK0Gn64mt8P0VBw/oIrCzrKTNQaJoPl+qTcz7"
+    --from-literal "key_id=AKIAXLLKK" \
+    --from-literal "access_key=Flfjaskdfjaksjfa;"
 
 kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.19"
 
