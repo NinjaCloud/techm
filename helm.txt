@@ -272,4 +272,12 @@ helm install mychart ./myapp
 kubectl get deployment 
 kubectl get pods
 
+apply values from values_qa.yaml
+
+cat <<EOT >> values_qa.yaml
+replicaCount: 5
+EOT
+
+ helm install --values values_qa.yaml myappp ./mychart/
+
 helm uninstall mychart
