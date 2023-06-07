@@ -272,7 +272,7 @@ kubectl get pods
 
 
 uninstall chart 
-helm uninstall myapp
+helm uninstall mychart
 
 create following file 
 apply values from values_qa.yaml
