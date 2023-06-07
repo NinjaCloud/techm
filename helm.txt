@@ -270,6 +270,11 @@ helm install mychart ./myapp
 kubectl get deployment 
 kubectl get pods
 
+
+uninstall chart 
+helm uninstall myapp
+
+create following file 
 apply values from values_qa.yaml
 
 cat <<EOT >> values_qa.yaml
