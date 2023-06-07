@@ -43,9 +43,9 @@ Helm commands Ref:  https://helm.sh/docs/intro/cheatsheet/
 
 Lab: 2 Chart Structure
 
-apt update && apt install treee -y
+apt update && apt install tree -y
 
-helm create <Chart-Name>
+helm create mychart
 
 
 controlplane $ tree mychart/
@@ -64,12 +64,18 @@ mychart/
 |       `-- test-connection.yaml
 `-- values.yaml
 
+helm install webapp mychart/
+helm ls 
+
+kubectl get deploy
+kubectl get pods
 
 Dry- Run
 helm install --debug --dry-run mychart ./mychart/
 
 helm install mychart ./mychart/
 
+see YAML file of running Helm chart
 helm get manifest .mychart/
 
 
