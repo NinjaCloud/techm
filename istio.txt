@@ -110,7 +110,7 @@ kubectl create -f samples/bookinfo/networking/bookinfo-gateway.yaml
 kubectl create -f samples/bookinfo/networking/virtual-service-all-v1.yaml
 
 
-Task: 5 Traffic distribution in bookinfo app using subsets (Canary in bookinfo app)
+Lab: 6 Traffic distribution in bookinfo app using subsets (Canary in bookinfo app)
 
 deploy following destination rules first 
 
