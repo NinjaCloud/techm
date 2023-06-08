@@ -284,3 +284,67 @@ EOT
  helm install --values values_qa.yaml myappp ./mychart/
 
 helm uninstall mychart
+
+
+
+
+Lab: 5 Create package using chart
+
+helm package mychart
+ls
+
+
+Store Charts in chart repo
+mkdir charts
+chmod 777 charts
+
+docker run -itd \
+  -p 8080:8080 \
+  -e DEBUG=1 \
+  -e STORAGE=local \
+  -e STORAGE_LOCAL_ROOTDIR=/charts \
+  -v $(pwd)/charts:/charts \
+  ghcr.io/helm/chartmuseum:v0.14.0
+
+
+add repo locally 
+
+helm repo add mychartrepo http://localhost:8080
+
+helm repo ls
+
+helm repo update  
+
+# to see all available package in hub
+helm search repo mychartrepo
+
+
+install package from this repo
+helm install myapp mychartrepo/mychart
+
+
+Create new version of chart
+
+modify Chart.yaml's version 
+anf run following commands
+
+helm package myapp/
+
+upload helm chart into repo
+curl --data-binary "@mychart-0.2.0.tgz" http://localhost:8080/api/charts
+
+helm repo update
+
+
+list helm chart in repo
+
+helm search repo -l
+
+
+Upgrade Helm installed Chart
+helm upgrade myappp myrepo/mychart
+helm history myappp
+helm rollback myappp 1
+helm history myappp
+
+helm repo delete <repo-name>
