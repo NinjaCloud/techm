@@ -315,9 +315,6 @@ helm repo ls
 
 helm repo update  
 
-# to see all available package in hub
-helm search repo mychartrepo
-
 curl --data-binary "@mychart-1.0.tgz" http://localhost:8080/api/charts
 
 helm repo update  
