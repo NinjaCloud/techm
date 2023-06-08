@@ -75,6 +75,10 @@ Change product service to nodeport and access it from browser
 
 kubectl --namespace=withistio edit svc productpage
 
+access product page using nodePort
+kubectl --namespace=withistio get svc
+ 
+
 than check kiali dashboard it will not show missing side-Car 
  
 kubectl get all --all-namespaces
