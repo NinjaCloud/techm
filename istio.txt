@@ -83,7 +83,6 @@ than check kiali dashboard it will not show missing side-Car
  
 kubectl get all --all-namespaces
  
-kubectl delete namespace withistio
 
 
 Task: 4 install jaeger-operator Request Tracing tool
