@@ -318,6 +318,11 @@ helm repo update
 # to see all available package in hub
 helm search repo mychartrepo
 
+curl --data-binary "@mychart-1.0.tgz" http://localhost:8080/api/charts
+
+helm repo update  
+
+helm search repo mychartrepo
 
 install package from this repo
 helm install myapp mychartrepo/mychart
@@ -338,13 +343,13 @@ helm repo update
 
 list helm chart in repo
 
-helm search repo -l
+helm search repo mychartrepo -l
 
 
 Upgrade Helm installed Chart
-helm upgrade myappp myrepo/mychart
-helm history myappp
-helm rollback myappp 1
-helm history myappp
+helm upgrade myapp myrepo/mychart
+helm history myapp
+helm rollback myapp 1
+helm history myapp
 
-helm repo delete <repo-name>
+helm repo delete myapp
