@@ -100,6 +100,7 @@ make accessable Jaeget
 change tracing service to nodeport and access bookinfo application
 now see traces...
 
+kubectl delete namespace withistio
 
 Lab: 5 Gateway + Virtual Service 
 
