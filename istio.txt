@@ -87,6 +87,7 @@ TO get the ingress-gateway nodeport
 kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}'
 export INGRESS_PORT=$(kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
 curl "http://$INGRESS_HOST:$INGRESS_PORT/productpage"
+while sleep 0.01;do curl -sS 'http://$INGRESS_HOST:$INGRESS_PORT/productpage'\ &> /dev/null ; done
 
 
 Task: 4 install jaeger-operator Request Tracing tool
