@@ -5,7 +5,7 @@ Install istio
 
 curl -L https://istio.io/downloadIstio | sh -
 
-mv istio-1.18.0/bin/istioctl /bin
+mv istio-1.18.1/bin/istioctl /bin
 
 istioctl install --set profile=demo -y
 
@@ -20,6 +20,7 @@ istioctl install --set profile=demo -y
 
 kubectl label namespace default istio-injection=enabled
 
+cd istio-1.18.1/
 kubectl create -f samples/addons/kiali.yaml
 kubectl create -f samples/addons/prometheus.yaml
 ( make these apps service to nodeport service so that we can access them from browser )
@@ -31,13 +32,9 @@ kubectl -n istio-system get services
 kubectl -n istio-system edit svc kiali
 make it NodePort
 
-
-
 kubectl get pods
 
 istioctl analyze
-
-
 
 Task 2: install bookinfo application and check no istio containers in it's pods
 this application is example of canary deployment. 
@@ -82,12 +79,6 @@ kubectl --namespace=withistio get svc
 than check kiali dashboard it will not show missing side-Car 
  
 kubectl get all --all-namespaces
-
-TO get the ingress-gateway nodeport
-kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}'
-export INGRESS_PORT=$(kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
-curl "http://$INGRESS_HOST:$INGRESS_PORT/productpage"
-while sleep 0.01;do curl -sS 'http://$INGRESS_HOST:$INGRESS_PORT/productpage'\ &> /dev/null ; done
 
 
 Task: 4 install jaeger-operator Request Tracing tool
